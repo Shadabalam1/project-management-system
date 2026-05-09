@@ -79,6 +79,8 @@ export const getUser= asyncHandler(async (req, res) => {
     user
    }); 
 
+  // console.log("hey")
+
 });
 
 
