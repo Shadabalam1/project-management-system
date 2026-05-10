@@ -1,6 +1,6 @@
 import nodeMailer from "nodemailer";
 
-export const sendEmail = async (email, subject, message) => {
+export const sendEmail = async ({email, subject, message}) => {
 
     try {
         const transporter = nodeMailer.createTransport({
@@ -27,6 +27,5 @@ export const sendEmail = async (email, subject, message) => {
 } catch (error) {
         throw new Error("Email could not be sent");
 }
-
 
 }
