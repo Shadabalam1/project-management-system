@@ -58,7 +58,7 @@ router.post(
     );
 
     
-    router.get(
+    router.post(
     "/users",
      isAuthenticated, 
      isAuthorized("admin"), 

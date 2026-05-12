@@ -38,10 +38,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
     default: "null"
   },
-  expertise: {
-    type: String,
-    default: ""
-  },
+  // In your User model (models/user.js)
+expertise: [{
+  type: String,
+  trim: true
+}],
   maxstudents: {
     type: Number,
     default: 10,
