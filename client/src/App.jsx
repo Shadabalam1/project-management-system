@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 
 // Auth Pages
 import LoginPage from "./pages/auth/LoginPage";
@@ -35,22 +35,44 @@ import { ToastContainer } from "react-toastify";
 import { Loader } from "lucide-react";
 
 const App = () => {
+  const {authUser, loading} = useSelector((state) => state.auth); 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem("token");  
+
+    if (token && !authUser) {
+      // Dispatch an action to fetch user details using the token
+      dispatch({ type: "FETCH_USER_FROM_TOKEN", payload: token });
+    } else if (!token) {
+      // If no token, ensure authUser is null
+      dispatch({ type: "LOGOUT" });
+    } 
+  }, [dispatch, authUser]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="animate-spin" size={48} />
+      </div>
+    );  
+  }
 
   return (
-
-<BrowserRouter>
-
-<Routes>
-
-  {/* Auth Routes */}
-  
-  <Route path="/login" element={<LoginPage />} />
-  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-  <Route path="/reset-password" element={<ResetPasswordPage />} />
-</Routes>
-
-</BrowserRouter>
+    <BrowserRouter>
+      <Routes>
+        {/* Auth Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/password/reset/:token" element={<ResetPasswordPage />} />
+        
+        {/* Add other routes as needed */}
+      </Routes>
+      <ToastContainer theme="dark" />
+    </BrowserRouter>
   );
 };
 
 export default App;
+

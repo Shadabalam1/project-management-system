@@ -3,8 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-
-
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -25,16 +23,16 @@ const userSchema = new mongoose.Schema({
     select: false,
     minlength: [6, "Password must be at least 6 characters long"]
   },
-
   role: {
     type: String,
-    enum: ["user", "teacher", "admin"],
-    default: "user"
+    enum: {
+      values: ["Student", "Teacher", "Admin"],
+      message: "Role must be either Student, Teacher, or Admin"
+    },
+    default: "Student"
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
-
-
   department: {
     type: String,
     trim: true,
@@ -44,56 +42,37 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
-
   maxstudents: {
     type: Number,
     default: 10,
     min: [1, "Max students must be at least 1"]
   },
- assignedStudents: [{
+  assignedStudents: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   }],
-  
   supervisor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User" ,
+    ref: "User",
     default: null
   },
   projects: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Project",
     default: null
-  },
-
+  }
 },
- {
-     timestamps: true 
-    }
-);
+{
+  timestamps: true 
+});
 
-
-// userSchema.pre("save", async function (next) {
-
-//   if (!this.isModified("password")) {
-//     return next();
-//   }
-
-//   this.password = await bcrypt.hash(this.password, 10);
-
-//   next();
-
-// });
-
-
-userSchema.pre("save", async function () {
-
+userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    return;
+    return next();
   }
 
   this.password = await bcrypt.hash(this.password, 10);
-
+ // next();
 });
 
 userSchema.methods.generateToken = function () {
@@ -106,16 +85,17 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-
 userSchema.methods.getResetPasswordToken = function () {
-
   const resetToken = crypto.randomBytes(20).toString("hex");
   this.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
 
-
+// Delete the model if it already exists to avoid overwriting warnings
+if (mongoose.models.User) {
+  delete mongoose.models.User;
+}
 
 const User = mongoose.model("User", userSchema);
 
