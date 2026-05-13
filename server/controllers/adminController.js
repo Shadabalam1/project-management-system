@@ -52,8 +52,6 @@ export const deleteStudent = asyncHandler(async (req, res, next) => {
 
 
 
-
-
 export const createTeacher = asyncHandler(async (req, res, next) => {
     const { name, email, password, department, maxstudents, expertise } = req.body;
 
@@ -120,3 +118,9 @@ export const getUserById = asyncHandler(async (req, res, next) => {
 });
 
 
+
+export const assignSupervisor = asyncHandler(async (req, res, next) => {});
+
+export const getAllProjects = asyncHandler(async (req, res, next) => {});
+
+export const getDashboardStats = asyncHandler(async (req, res, next) => {});
